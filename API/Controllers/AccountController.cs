@@ -11,7 +11,7 @@ using API.Interfaces;
 using API.Extensions;
 namespace API.Controllers;
 
-public class AccountController(AppDBContext context, ITokenService tokenService): BaseApiController
+public class AccountController(AppDBContext context, ITokenService tokenService) : BaseApiController
 {
 
     [HttpPost("register")]  // api/account/register
@@ -45,6 +45,6 @@ public class AccountController(AppDBContext context, ITokenService tokenService)
     }
     private async Task<bool> EmailExists(string email)
     {
-        return await context.Users.AnyAsync(x => x.Email.ToLower()== email.ToLower());
+        return await context.Users.AnyAsync(x => x.Email.ToLower() == email.ToLower());
     }
 }
