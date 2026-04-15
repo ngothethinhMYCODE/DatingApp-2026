@@ -16,10 +16,10 @@ import { DeleteButton } from "../../../shared/delete-button/delete-button";
 })
 export class MemberPhotos implements OnInit {
   protected memberService = inject(MemberService);
-  protected accountService=inject(AccountService);
+  protected accountService = inject(AccountService);
   private route = inject(ActivatedRoute);
   protected photos = signal<Photo[]>([]);
-  protected loading=signal(false);
+  protected loading = signal(false);
 
   ngOnInit(): void {
     const memberId = this.route.parent?.snapshot.paramMap.get('id');
@@ -29,38 +29,45 @@ export class MemberPhotos implements OnInit {
       });
     }
   }
-  onUploadImage(file: File){
+  onUploadImage(file: File) {
     this.loading.set(true);
     this.memberService.uploadPhoto(file).subscribe({
-      next: photo =>{
+      next: photo => {
         this.memberService.editMode.set(false);
         this.loading.set(false);
-        this.photos.update(photos=>[...photos,photo])
+        this.photos.update(photos => [...photos, photo])
+        if(!this.memberService.member()?.imageUrl){
+          this.setMainLocalPhoto(photo);
+        }
       },
-      error: error=>{
+      error: error => {
         console.log('Error uploading image', error);
         this.loading.set(false);
       }
     })
   }
-  setMainPhoto(photo: Photo){
+  setMainPhoto(photo: Photo) {
     this.memberService.setMainPhoto(photo).subscribe({
-      next:()=>{
-        const currentUser=this.accountService.currentUser();
-        if(currentUser) currentUser.imageURL=photo.url;
-        this.accountService.setCurrentUser(currentUser as User);
-        this.memberService.member.update(member=>({
-          ...member,
-          imageUrl: photo.url
-        }) as Member)
+      next: () => {
+        this.setMainLocalPhoto(photo)
       }
     })
   }
-  deletePhoto(photoId: number){
+
+  deletePhoto(photoId: number) {
     this.memberService.deletePhoto(photoId).subscribe({
-      next:()=>{
-        this.photos.update(photos=>photos.filter(x=>x.id!== photoId))
+      next: () => {
+        this.photos.update(photos => photos.filter(x => x.id !== photoId))
       }
     })
+  }
+  private setMainLocalPhoto(photo: Photo) {
+    const currentUser = this.accountService.currentUser();
+    if (currentUser) currentUser.imageURL = photo.url;
+    this.accountService.setCurrentUser(currentUser as User);
+    this.memberService.member.update(member => ({
+      ...member,
+      imageUrl: photo.url
+    }) as Member)
   }
 }
