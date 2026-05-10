@@ -19,7 +19,7 @@ export class LikesService {
     params=params.append('pageNumber', pageNumber);
     params=params.append('pageSize', pageSize);
     params=params.append('predicate', predicate);
-    return this.http.get<PaginatedResult<Member>>(this.baseUrl+'likes?predicate='+{predicate});
+    return this.http.get<PaginatedResult<Member>>(this.baseUrl+'likes', {params});
   }
   getLikeIds(){
     return this.http.get<string[]>(this.baseUrl+'likes/list').subscribe({
