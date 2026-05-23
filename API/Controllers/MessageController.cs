@@ -21,6 +21,8 @@ public class MessagesController(IMessageRespository messageRespository, IMemberR
 
         var message=new Message
         {
+            Sender = sender,
+            Recipient = recipient,
             SenderId=sender.Id,
             RecipientId=recipient.Id,
             Content=createMessageDto.Content,
